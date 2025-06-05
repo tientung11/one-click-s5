@@ -1,0 +1,51 @@
+#!/bin/bash
+
+# === INPUT THỦ CÔNG (BẠN CÓ THỂ TUỲ CHỈNH LẠI CHO TỰ ĐỘNG HOÁ) ===
+PORT=1234
+USERNAME=tientung
+PASSWORD=123456
+BOT_TOKEN="7557122184:AAF2NyHAEATM-dU40vCEAZPG-zzGtvHz_nU"
+USER_ID="1810862844"
+
+# === Cài đặt Dante SOCKS5 server ===
+apt update -y
+apt install -y dante-server
+
+# === Tạo cấu hình Dante ===
+cat > /etc/danted.conf <<EOF
+logoutput: /var/log/danted.log
+internal: eth0 port = $PORT
+external: eth0
+
+method: username none
+user.notprivileged: nobody
+
+client pass {
+    from: 0.0.0.0/0 to: 0.0.0.0/0
+    log: connect disconnect error
+}
+
+pass {
+    from: 0.0.0.0/0 to: 0.0.0.0/0
+    protocol: tcp udp
+    method: username
+    log: connect disconnect error
+}
+EOF
+
+# === Tạo user và set password ===
+useradd -M -s /bin/false $USERNAME
+echo "$USERNAME:$PASSWORD" | chpasswd
+
+# === Bật Dante khi khởi động và khởi động dịch vụ ===
+systemctl restart danted
+systemctl enable danted
+
+# === Lấy địa chỉ IP công khai ===
+IP=$(curl -s ifconfig.me)
+
+# === Gửi thông tin về Telegram ===
+MESSAGE="🧦 SOCKS5 Proxy đã sẵn sàng:\nIP: $IP\nPort: $PORT\nUser: $USERNAME\nPass: $PASSWORD"
+curl -s -X POST "https://api.telegram.org/bot$BOT_TOKEN/sendMessage" \
+     -d chat_id="$USER_ID" \
+     -d text="$MESSAGE"
