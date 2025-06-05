@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# === Cài đặt Dante SOCKS5 server ===
-apt update -y
-apt install -y dante-server
 
 # Function to draw box around text
 draw_box() {
@@ -135,6 +132,6 @@ send_telegram_message() {
     local message="$1"
     curl -s -X POST "https://api.telegram.org/bot${BOT_TOKEN}/sendMessage" \
         -d chat_id="${USER_ID}" \
-        -d text="$message" \
-        -d parse_mode="Markdown" >/dev/null 2>&1
+        --data-urlencode "text=$message" \
+        -d parse_mode="MarkdownV2" >/dev/null 2>&1
 }
